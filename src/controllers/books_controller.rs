@@ -7,7 +7,14 @@ use futures::stream::TryStreamExt;
 use mongodb::bson::oid::ObjectId;
 use serde_json::json;
 use crate::extractors::BookIdExists;
-// use mongodb::options::FindOptions;
+
+
+fn err_book_not_found() -> HttpResponse {
+    HttpResponse::NotFound()
+        .json(json!({
+            "message": "Book not found",
+        }).to_string())
+}
 
 
 #[get("/")]
@@ -67,9 +74,7 @@ pub async fn create(body: web::Json<BookForm>, data: web::Data<AppState>) -> imp
 #[get("/books/{id}")]
 pub async fn view(book_id: BookIdExists, data: web::Data<AppState>) -> impl Responder {
     if !book_id.exists {
-        return HttpResponse::NotFound().json(json!({
-            "message": "Book not found",
-        }));
+        return err_book_not_found();
     }
 
     let collection = books_collection(&data.database);
@@ -77,9 +82,7 @@ pub async fn view(book_id: BookIdExists, data: web::Data<AppState>) -> impl Resp
 
     // check if book exists
     if book.is_none() {
-        return HttpResponse::NotFound().json(json!({
-            "message": "Book not found",
-        }));
+        return err_book_not_found();
     }
 
     HttpResponse::Ok()
@@ -87,35 +90,65 @@ pub async fn view(book_id: BookIdExists, data: web::Data<AppState>) -> impl Resp
 }
 
 #[put("/books/{id}")]
-pub async fn update() -> impl Responder {
-    let response = json!({
-        "message": "Update Book by ID",
-    });
+pub async fn update(book_id: BookIdExists, body: web::Json<BookForm>, data: web::Data<AppState>) -> impl Responder {
+    if !book_id.exists {
+        return err_book_not_found();
+    }
 
-    HttpResponse::Ok()
-        .json(response)
+    // validate data
+    match validate_book_form(&body) {
+        Ok(_) => {}
+        Err(err) => {
+            return HttpResponse::BadRequest().json(json!({
+                "message": err,
+            }));
+        }
+    }
+
+    let collection = books_collection(&data.database);
+
+    // update book
+    let update = collection.update_one(
+        doc! {"_id": book_id.id.unwrap()},
+        doc! {"$set": {
+            "title": body.title.clone(),
+            "description": body.description.clone(),
+            "available": body.available.clone(),
+            "updatedAt": DateTime::now(),
+        }},
+        None,
+    ).await.unwrap();
+
+    if update.modified_count > 0 {
+        HttpResponse::Ok().json(json!({"message": "Book updated successfully"}))
+    } else {
+        err_book_not_found()
+    }
 }
 
 #[delete("/books/{id}")]
-pub async fn delete() -> impl Responder {
-    let response = json!({
-        "message": "Delete Book by ID",
-    });
+pub async fn delete(book_id: BookIdExists, data: web::Data<AppState>) -> impl Responder {
+    if !book_id.exists {
+        return err_book_not_found();
+    }
 
-    HttpResponse::Ok()
-        .content_type(ContentType::json())
-        .body(response.to_string())
+    let collection = books_collection(&data.database);
+    let deleted = collection.delete_one(doc! {"_id": book_id.id.unwrap()}, None).await.unwrap();
+
+    if deleted.deleted_count > 0 {
+        HttpResponse::Ok().json(json!({"message": "Book deleted successfully"}))
+    } else {
+        HttpResponse::Ok().json(json!({"message": "Book not found, or already deleted"}))
+    }
 }
 
 #[delete("/books")]
-pub async fn delete_all() -> impl Responder {
-    let response = json!({
-        "message": "Delete All Books",
-    });
+pub async fn delete_all(data: web::Data<AppState>) -> impl Responder {
+    let collection = books_collection(&data.database);
 
-    HttpResponse::Ok()
-        .content_type(ContentType::json())
-        .body(response.to_string())
+    let deleted = collection.delete_many(doc! {}, None).await.unwrap();
+
+    HttpResponse::Ok().json(json!({"message": format!("{} books deleted successfully", deleted.deleted_count)}))
 }
 
 
