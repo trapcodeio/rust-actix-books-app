@@ -5,6 +5,7 @@ mod types;
 mod models;
 mod extractors;
 
+use actix_cors::Cors;
 use actix_web::{App, error, HttpResponse, HttpServer};
 use actix_web::middleware::{Condition, Logger};
 use actix_web::web::{Data, JsonConfig};
@@ -39,7 +40,6 @@ async fn main() -> std::io::Result<()> {
         env_logger::init_from_env(env_logger::Env::new().default_filter_or("info"));
     }
 
-
     HttpServer::new(move || {
         App::new()
             .app_data(json_config_error_handler())
@@ -47,6 +47,13 @@ async fn main() -> std::io::Result<()> {
                 database: database.clone(),
             }))
             .wrap(Condition::new(env.is_development(), Logger::new("%s - %r - [%D]")))
+            .wrap(
+                Cors::default()
+                    .allow_any_origin() // You can customise this to only allow specific origins
+                    .allow_any_method() // Allows all methods (GET, POST, DELETE, etc.)
+                    .allow_any_header() // Allows all headers
+                    .max_age(3600),     // Sets the maximum age for CORS preflight requests
+            )
             .service(books_controller::index)
             .service(books_controller::all)
             .service(books_controller::create)
@@ -59,7 +66,6 @@ async fn main() -> std::io::Result<()> {
         .run()
         .await
 }
-
 
 
 /// Json config error handler
