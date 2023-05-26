@@ -32,7 +32,7 @@ pub fn load_env() -> Env {
         env: std::env::var("ENV").unwrap_or("development".to_string()),
         app_name: std::env::var("APP_NAME").unwrap_or("Books App".to_string()),
         app_port: std::env::var("APP_PORT").unwrap_or("9000".to_string()).parse::<u16>().unwrap(),
-        mongodb_server: std::env::var("MONGODB_SERVER").unwrap_or("mongodb://127.0.0.1:27017".to_string()),
+        mongodb_server: std::env::var("MONGODB_SERVER").unwrap_or("mongodb://mongo/books".to_string()),
         mongodb_database: std::env::var("MONGODB_DATABASE").unwrap_or("books".to_string()),
     }
 }

@@ -5,8 +5,9 @@ services:
     build:
       context: ./../
       dockerfile: .docker/Dockerfile
+      args:
+        - BUILD_MODE=release # change to debug for debug mode
     environment:
-      - BUILD_MODE=debug # change to debug for debug mode
       - APP_PORT=9000
     ports:
       - "9091:9000"
