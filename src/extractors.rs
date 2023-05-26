@@ -1,11 +1,9 @@
-use actix_web::{dev::Payload, Error, FromRequest, HttpRequest, error};
-
-use futures::future::{ok, Ready, err};
-use mongodb::bson::doc;
+use actix_web::{dev::Payload, Error, FromRequest, HttpRequest};
+use futures::future::{ok, Ready};
 use mongodb::bson::oid::ObjectId;
-use serde_json::json;
-use crate::models::book_model::books_collection;
-use crate::types::AppState;
+
+
+
 
 #[derive(Debug)]
 pub struct BookIdExists {

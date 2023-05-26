@@ -60,7 +60,7 @@ pub async fn create(body: web::Json<BookForm>, data: web::Data<AppState>) -> imp
         _id: ObjectId::new(),
         title: body.title.clone(),
         description: body.description.clone(),
-        available: body.available.clone(),
+        available: body.available,
         createdAt: DateTime::now(),
         updatedAt: DateTime::now(),
     };
@@ -113,7 +113,7 @@ pub async fn update(book_id: BookIdExists, body: web::Json<BookForm>, data: web:
         doc! {"$set": {
             "title": body.title.clone(),
             "description": body.description.clone(),
-            "available": body.available.clone(),
+            "available": body.available,
             "updatedAt": DateTime::now(),
         }},
         None,
