@@ -62,7 +62,7 @@ async fn main() -> std::io::Result<()> {
             .service(books_controller::delete)
             .service(books_controller::delete_all)
     })
-        .bind(("127.0.0.1", port))?
+        .bind(("0.0.0.0", port))?
         .run()
         .await
 }
