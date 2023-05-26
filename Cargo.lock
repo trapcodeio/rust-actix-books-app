@@ -11,6 +11,7 @@ dependencies = [
  "env_logger",
  "futures",
  "mongodb",
+ "regex",
  "serde",
  "serde_json",
 ]
