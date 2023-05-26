@@ -1,8 +1,8 @@
-# Build argument to determine if we're doing a release or debug build
-ARG BUILD_MODE=debug
-
 # Stage 1: Build
 FROM rust:1.68 as builder
+
+# Build argument to determine if we're doing a release or debug build
+ARG BUILD_MODE=debug
 
 WORKDIR /usr/src/actix-books-app
 
@@ -19,6 +19,8 @@ RUN if [ "$BUILD_MODE" = "debug" ] ; then cargo build --target=x86_64-unknown-li
 
 # Stage 2: Setup the runtime environment
 FROM scratch
+
+ARG BUILD_MODE=debug
 
 # If build mode is 'release', copy from release folder. Otherwise, copy from debug folder.
 COPY --from=builder /usr/src/actix-books-app/target/x86_64-unknown-linux-musl/${BUILD_MODE}/actix-books-app /actix-books-app
