@@ -12,7 +12,7 @@ use crate::extractors::BookIdExists;
 fn err_book_not_found() -> HttpResponse {
     HttpResponse::NotFound()
         .json(json!({
-            "message": "Book not found",
+            "error": "Book not found",
         }).to_string())
 }
 
@@ -48,7 +48,7 @@ pub async fn create(body: web::Json<BookForm>, data: web::Data<AppState>) -> imp
         Ok(_) => {}
         Err(err) => {
             return HttpResponse::BadRequest().json(json!({
-                "message": err,
+                "error": err,
             }));
         }
     }
@@ -100,7 +100,7 @@ pub async fn update(book_id: BookIdExists, body: web::Json<BookForm>, data: web:
         Ok(_) => {}
         Err(err) => {
             return HttpResponse::BadRequest().json(json!({
-                "message": err,
+                "error": err,
             }));
         }
     }

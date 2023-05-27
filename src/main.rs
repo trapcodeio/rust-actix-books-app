@@ -86,7 +86,7 @@ fn json_config_error_handler() -> JsonConfig {
             // create custom error response
             let response = HttpResponse::BadRequest().json(json!({
                 "code": "bad_body",
-                "message": format!("Missing field: `{}`", field_name),
+                "error": format!("Missing field: `{}`", field_name),
                 "field": field_name.to_string(),
             }));
 
