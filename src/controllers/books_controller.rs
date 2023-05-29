@@ -1,7 +1,7 @@
 use actix_web::{get, web, put, delete, post, HttpResponse, Responder};
 use actix_web::http::header::ContentType;
 use crate::models::book_model::{ApiBook, convert_db_book_to_api_book, books_collection, BookForm, validate_book_form, DbBook};
-use crate::types::AppState;
+use crate::types::{AppState, BooksQuery};
 use mongodb::bson::{DateTime, doc};
 use futures::stream::TryStreamExt;
 use mongodb::bson::oid::ObjectId;
@@ -29,9 +29,17 @@ pub async fn index() -> impl Responder {
 }
 
 #[get("/books")]
-pub async fn all(data: web::Data<AppState>) -> impl Responder {
+pub async fn all(data: web::Data<AppState>, query: web::Query<BooksQuery>) -> impl Responder {
+    // get title query
+    let title = query.title.clone();
+
+    let query = match title {
+        Some(title) => doc! {"title": doc! {"$regex": title, "$options": "i"}},
+        None => doc! {},
+    };
+
     let collection = books_collection(&data.database);
-    let mut cursor = collection.find(doc! {}, None).await.unwrap();
+    let mut cursor = collection.find(query, None).await.unwrap();
 
     let mut results: Vec<ApiBook> = Vec::new();
     while let Some(result) = cursor.try_next().await.unwrap() {
