@@ -5,13 +5,12 @@ services:
     build:
       context: ./../
       dockerfile: .docker/Dockerfile
-      args:
-        - BUILD_MODE=release # change to debug for debug mode
+      target: debug
     environment:
       - APP_PORT=9000
       - MONGODB_SERVER=mongodb://mongo/books
     ports:
-      - "9091:9000"
+      - "9000:9000"
     volumes:
       - ./../:/usr/src/app
     links:
