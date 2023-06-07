@@ -10,10 +10,13 @@ RUN apk add musl-dev
 # Download the target for this system. This will be the Rust standard library.
 RUN rustup target add x86_64-unknown-linux-musl
 
+RUN cargo install cargo-watch
+
 COPY . .
 
-RUN cargo build --target=x86_64-unknown-linux-musl
-CMD ["./target/x86_64-unknown-linux-musl/debug/actix-books-app"]
+#RUN cargo build --target=x86_64-unknown-linux-musl
+#CMD ["./target/x86_64-unknown-linux-musl/debug/actix-books-app"]
+CMD ["cargo", "watch", "-x", "run"]
 
 # Stage 2: Build
 FROM rust:1.68-alpine as builder
