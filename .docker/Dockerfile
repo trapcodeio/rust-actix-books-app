@@ -5,8 +5,8 @@ WORKDIR /usr/src/app
 
 # Needed for VS Code Remote Development
 RUN apk add musl libgcc libstdc++ git curl wget bash ca-certificates gcompat openssh-client
-# Install musl-tools
-RUN apk add musl-dev
+# Install Essential Build Tools
+RUN apk add build-base musl-dev
 # Download the target for this system. This will be the Rust standard library.
 RUN rustup target add x86_64-unknown-linux-musl
 
@@ -23,8 +23,8 @@ CMD ["cargo", "watch", "-x", "run"]
 FROM rust:1.68-alpine as builder
 WORKDIR /usr/src/app
 
-# Needed for VS Code Remote Development
-RUN apk add musl-dev
+# Install Essential Build Tools
+RUN apk add build-base musl-dev
 # Download the target for this system. This will be the Rust standard library.
 RUN rustup target add x86_64-unknown-linux-musl
 
