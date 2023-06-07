@@ -13,7 +13,7 @@ services:
     ports:
       - "9091:9000"
     volumes:
-      - ./../:/usr/src/actix-books-app
+      - ./../:/usr/src/app
     links:
       - mongo
   mongo:

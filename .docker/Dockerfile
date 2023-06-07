@@ -1,31 +1,37 @@
-# Stage 1: Build
-FROM rust:1.68-alpine as builder
-
-# Build argument to determine if we're doing a release or debug build
-ARG BUILD_MODE=debug
+# Stage 1: Debug
+FROM rust:1.68-alpine as debug
 
 WORKDIR /usr/src/actix-books-app
 
 # Needed for VS Code Remote Development
 RUN apk add musl libgcc libstdc++ git curl wget bash ca-certificates gcompat openssh-client
-
 # Install musl-tools
 RUN apk add musl-dev
-
 # Download the target for this system. This will be the Rust standard library.
 RUN rustup target add x86_64-unknown-linux-musl
 
 COPY . .
 
-# If build mode is 'debug', build without --release flag. Otherwise, build with --release flag.
-RUN if [ "$BUILD_MODE" = "debug" ] ; then cargo build --target=x86_64-unknown-linux-musl ; else cargo build --release --target=x86_64-unknown-linux-musl ; fi
+RUN cargo build --target=x86_64-unknown-linux-musl
+CMD ["./target/x86_64-unknown-linux-musl/debug/actix-books-app"]
 
-# Stage 2: Setup the runtime environment
-FROM alpine
+# Stage 2: Build
+FROM rust:1.68-alpine as builder
+WORKDIR /usr/src/actix-books-app
 
-ARG BUILD_MODE=debug
+# Needed for VS Code Remote Development
+RUN apk add musl-dev
+# Download the target for this system. This will be the Rust standard library.
+RUN rustup target add x86_64-unknown-linux-musl
 
-# If build mode is 'release', copy from release folder. Otherwise, copy from debug folder.
-COPY --from=builder /usr/src/actix-books-app/target/x86_64-unknown-linux-musl/${BUILD_MODE}/actix-books-app /actix-books-app
+COPY . .
+
+# Build for release.
+RUN cargo build --release --target=x86_64-unknown-linux-musl
+
+# Stage 3: Release
+FROM alpine as release
+COPY --from=builder /usr/src/actix-books-app/target/x86_64-unknown-linux-musl/release/actix-books-app /actix-books-app
 
 CMD ["/actix-books-app"]
+
