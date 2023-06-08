@@ -13,7 +13,7 @@ RUN cargo install cargo-watch
 
 COPY . .
 
-# Build to cache dependencies
+# Build to cache dependenciess
 RUN cargo build
 
 # Run the project and watch only `src` for changes.
