@@ -9,6 +9,7 @@ RUN apk add build-base musl-dev
 # Needed for VS Code Remote Development
 RUN apk add musl libgcc libstdc++ git curl wget bash ca-certificates gcompat openssh-client
 
+# Inclded for remote development
 RUN cargo install cargo-watch
 
 COPY . .
@@ -16,8 +17,10 @@ COPY . .
 # Build to cache dependencies
 RUN cargo build
 
-# Run the project and watch only `src` for changes.
-CMD ["cargo", "watch", "-x", "run", "-w", "src"]
+# Run the debug built binary
+# This is used instead of cargo watch to prevent building on startup
+# if you want to use cargo watch, start it using `cargo watch -x run`
+CMD ["./target/debug/actix-books-app"]
 
 # Stage 2: Build
 FROM rust:1.68-alpine as builder
