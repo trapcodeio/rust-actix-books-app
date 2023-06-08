@@ -15,7 +15,7 @@ RUN cargo install cargo-watch
 COPY . .
 
 # Build to cache dependencies
-RUN cargo build --target x86_64-unknown-linux-musl
+RUN cargo build
 
 # Run the project and watch only `src` for changes.
 CMD ["cargo", "watch", "-x", "run", "-w", "src"]
