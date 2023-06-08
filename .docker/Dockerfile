@@ -3,12 +3,11 @@ FROM rust:1.68-alpine as debug
 
 WORKDIR /usr/src/app
 
-# Needed for VS Code Remote Development
-RUN apk add musl libgcc libstdc++ git curl wget bash ca-certificates gcompat openssh-client
 # Install Essential Build Tools
 RUN apk add build-base musl-dev
-# Download the target for this system. This will be the Rust standard library.
-RUN rustup target add x86_64-unknown-linux-musl
+
+# Needed for VS Code Remote Development
+RUN apk add musl libgcc libstdc++ git curl wget bash ca-certificates gcompat openssh-client
 
 RUN cargo install cargo-watch
 
