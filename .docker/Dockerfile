@@ -1,14 +1,11 @@
 # Stage 1: Debug
-FROM rust:1.68-alpine as debug
+FROM rust:1.68 as debug
 
 WORKDIR /usr/src/app
 
 # Needed for VS Code Remote Development
-RUN apk add musl libgcc libstdc++ git curl wget bash ca-certificates gcompat openssh-client
-# Install Essential Build Tools
-RUN apk add build-base musl-dev
-# Download the target for this system. This will be the Rust standard library.
-RUN rustup target add x86_64-unknown-linux-musl
+RUN apt-get update && \
+    apt-get install -y gcc libc6-dev git curl wget bash ca-certificates openssh-client build-essential
 
 RUN cargo install cargo-watch
 
@@ -16,7 +13,6 @@ COPY . .
 
 RUN cargo build
 
-#CMD ["./target/x86_64-unknown-linux-musl/debug/actix-books-app"]
 CMD ["cargo", "watch", "-x", "run"]
 
 # Stage 2: Build
