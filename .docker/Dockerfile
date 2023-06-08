@@ -17,7 +17,8 @@ COPY . .
 # Build to cache dependencies
 RUN RUN cargo build --target x86_64-unknown-linux-musl
 
-CMD ["cargo", "watch", "-x", "run"]
+# Run the project and watch only `src` for changes.
+CMD ["cargo", "watch", "-x", "run", "-w", "src"]
 
 # Stage 2: Build
 FROM rust:1.68-alpine as builder
