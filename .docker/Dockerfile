@@ -7,7 +7,7 @@ WORKDIR /usr/src/app
 RUN apt-get update && apt-get install -y build-essential
 
 # Needed for VS Code Remote Development
-RUN apt-get install -y curl wget git bash ca-certificates openssh-client
+RUN apt-get install -y musl-tools libgcc-$(dpkg --print-architecture)1 libstdc++6 git curl wget bash ca-certificates openssh-client
 
 RUN cargo install cargo-watch
 
