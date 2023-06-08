@@ -11,8 +11,6 @@ RUN cargo install cargo-watch
 
 COPY . .
 
-RUN cargo build
-
 CMD ["cargo", "watch", "-x", "run"]
 
 # Stage 2: Build
