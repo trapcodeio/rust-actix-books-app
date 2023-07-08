@@ -1,5 +1,5 @@
 # Stage 1: Debug
-FROM rust:1.68-alpine as debug
+FROM rust:1.68-alpine as dev
 
 WORKDIR /usr/src/app
 
@@ -37,7 +37,7 @@ COPY . .
 RUN cargo build --release --target=x86_64-unknown-linux-musl
 
 # Stage 3: Release
-FROM alpine as release
+FROM alpine as prod
 # Add necessary runtime dependencies
 RUN apk add --no-cache libgcc libstdc++
 COPY --from=builder /usr/src/app/target/x86_64-unknown-linux-musl/release/actix-books-app /actix-books-app
