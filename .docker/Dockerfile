@@ -42,4 +42,5 @@ FROM alpine as prod
 RUN apk add --no-cache libgcc libstdc++
 COPY --from=builder /usr/src/app/target/x86_64-unknown-linux-musl/release/actix-books-app /actix-books-app
 
+ENV ENV=production
 CMD ["/actix-books-app"]
